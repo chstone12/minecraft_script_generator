@@ -18,7 +18,7 @@
 
 <span style="color:rgb(206, 74, 166);"><b>대사가 다 나온 뒤에 실행될 커맨드 :</b> </span><span style="color:rgb(133, 12, 96)">/setblock <input style="width: 80px" id="setblock" placeholder="~ ~1 ~"> air </span>
 <br>
-<span style="color: gray; font-size:small">숫자 1 옆에 있는 ` ← 이 기호 하나 당 뒤의 대사가 1틱 늦어집니다. (투명 텍스트를 추가한다고 생각하세요.) (개 많이 써도 됩니다 어차피 이거 100개 써도 그 중에 1개만 커맨드로 나와요 (actionbar라면 30개 당 1개))<br>ctrl + z를 누르면 undo, ctrl + shift + z를 누르면 redo가 됩니다. 줄바꿈은 shift + enter, ㅁ한자엔터 누르면 나오는 ＃ 이거 쓰면 다음 페이지<br>역슬래쉬, 큰따옴표 그냥 써도 됨<br>ㅁ한자2 ㅁ한자3 누르면 나오는 ＆＊＠ 이걸로 ＆yellow＊텍스트＠ 이렇게 쓰면 글자 색 바뀜 당연히 RGB도 가능</span>
+<span style="color: gray; font-size:small">숫자 1 옆에 있는 ` ← 이 기호 하나 당 뒤의 대사가 1틱 늦어집니다. (투명 텍스트를 추가한다고 생각하세요.) (개 많이 써도 됩니다 어차피 이거 100개 써도 그 중에 1개만 커맨드로 나와요 (actionbar라면 30개 당 1개))<br>ctrl + z를 누르면 undo, ctrl + shift + z를 누르면 redo가 됩니다. 줄바꿈은 shift + enter, ㅁ한자엔터 누르면 나오는 ＃ 이거 쓰면 다음 페이지<br>역슬래쉬, 큰따옴표 그냥 써도 됨<br>ㅁ한자2 ㅁ한자3 누르면 나오는 ＆＊＠ 이걸로 ＆yellow＊텍스트＠ 이렇게 쓰면 글자 색 바뀜 당연히 RGB도 가능이고 저기 텍스트 부분에 ㄴ한자1 ㄴ한자2 누르면 나오는 ＂ 또는 （ 쓰면 닉네임 출력 가능 (각각 selector @p, @a)</span>
 <br>
 
 <br><br>
@@ -137,7 +137,7 @@
                 
 
             }
-            result = result.replace(/쪯/g, "\\n").replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"")
+            result = result.replace(/쪯/g, "\\n").replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"").replace(/\"text\":\"＂\"/g, "\"selector\":\"@p\"").replace(/\"text\":\"（\"/g, "\"selector\":\"@p\"")
             if(mode == 2) result = result.replace(/\\n/g, " ")
             output.value = result
 
