@@ -1,0 +1,150 @@
+<title>대사 한 글자씩 나오게 하기</title>
+
+<span style="color:rgb(30, 60, 196); font-size:xx-large"><b>입력<br></b></span>
+
+<input width="100px" id="objective" placeholder="objective">
+<input width="100px" id="name" placeholder="name">
+<button width="100px" id="name" onclick="tellraw()" style="width: 70px; height:20px">tellraw</button>
+<button width="100px" id="name" onclick="actionbar()" style="width: 80px; height:20px">actionbar</button>
+<span id="setmode"></span>
+<br>
+
+</span><textarea rows="4" cols="70" id="input3" wrap="off" accesskey="i" onkeydown="run(0)" placeholder="대사 맨 앞에 항상 띄울 텍스트 (안 써도 됨)"></textarea>
+<br>
+<textarea rows="15" cols="169" id="input" wrap="off" accesskey="i" onkeydown="run(0)" placeholder="대사"></textarea>
+<br>
+</span><textarea rows="4" cols="70" id="input2" wrap="off" accesskey="i" onkeydown="run(0)" placeholder="대사 맨 뒤에 항상 띄울 텍스트 (안 써도 됨)"></textarea>
+<br>
+
+<span style="color:rgb(206, 74, 166);"><b>대사가 다 나온 뒤에 실행될 커맨드 :</b> </span><span style="color:rgb(133, 12, 96)">/setblock <input style="width: 80px" id="setblock" placeholder="~ ~1 ~"> air </span>
+<br>
+<span style="color: gray; font-size:small">숫자 1 옆에 있는 ` ← 이 기호 하나 당 뒤의 대사가 1틱 늦어집니다. (투명 텍스트를 추가한다고 생각하세요.) (개 많이 써도 됩니다 어차피 이거 100개 써도 그 중에 1개만 커맨드로 나와요 (actionbar라면 30개 당 1개))<br>ctrl + z를 누르면 undo, ctrl + shift + z를 누르면 redo가 됩니다. 줄바꿈은 shift + enter, ㅁ한자엔터 누르면 나오는 ＃ 이거 쓰면 다음 페이지<br>역슬래쉬, 큰따옴표 그냥 써도 됨<br>ㅁ한자2 ㅁ한자3 누르면 나오는 ＆＊＠ 이걸로 ＆yellow＊텍스트＠ 이렇게 쓰면 글자 색 바뀜 당연히 RGB도 가능</span>
+<br>
+
+<br><br>
+<span style="color:rgb(30, 60, 196); font-size:xx-large"><b>출력 <span style="color:rgb(157, 198, 235); font-size:medium">(함수 파일에 복붙하고 그 함수를 반복형 커맨드에 넣으세요)</span><br></b></span>
+
+<textarea rows="169" cols="169" id="output" wrap="off" accesskey="o" placeholder="출력창"></textarea>
+<br>by chstone12
+<script>
+
+    output.readOnly = true;
+    let mode = 1;
+
+
+
+    window.onload = function() {
+        var ls_objective = localStorage.getItem('objective')
+        var ls_input = localStorage.getItem('input')
+        var ls_input2 = localStorage.getItem('input2')
+        var ls_input3 = localStorage.getItem('input3')
+        var ls_name = localStorage.getItem('name')
+        
+        document.getElementById('objective').value = localStorage.getItem('objective')
+        document.getElementById('input').value = localStorage.getItem('input')
+        document.getElementById('input2').value = localStorage.getItem('input2')
+        document.getElementById('input3').value = localStorage.getItem('input3')
+        document.getElementById('name').value = localStorage.getItem('name')
+    }
+
+    function tellraw() {
+        const showmode = document.getElementById("setmode");
+        showmode.innerText = "tellraw로 설정됨"
+        mode = 1;
+        run(1)
+    }
+    function actionbar() {
+        const showmode = document.getElementById("setmode");
+        showmode.innerText = "actionbar로 설정됨"
+        mode = 2;
+
+        run(1)
+    }
+    function run(anyway_run) {
+
+    let j = 0;
+    let close_brace_required = 0;
+        
+
+        if((event.key == 'Enter' && !event.shiftKey) || anyway_run == 1) {
+            event.preventDefault();
+            
+            const objective = document.getElementById('objective').value
+            const name = document.getElementById('name').value
+            const input = document.getElementById('input').value
+            const input2 = document.getElementById('input2').value
+            const input3 = document.getElementById('input3').value
+
+            localStorage.setItem('objective', objective);
+            localStorage.setItem('name', name);
+            localStorage.setItem('input', input);
+            localStorage.setItem('input2', input2);
+            localStorage.setItem('input3', input3);
+
+            let result = "";
+            let setblock_ = document.getElementById("setblock").value
+
+            if(objective == "" || name == "" || input == "") result = "objective랑 name이랑 대사 쓰셈 안그러면 안만들어줄꺼임ㅡㅡ"
+            else if(input.includes('DROP TABLE')) result = "[object Object]"
+            else if(input == '키') result = "169.9"
+            else if(input.includes('영양제 먹어라')) result = '영양제 먹어라? 이게 어딜 감히 그냥...'
+            
+
+            
+            
+            else {
+
+                if(setblock_ == '') setblock_ = "~ ~1 ~"
+
+
+                const replaced_input = input.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
+                const replaced_input2 = input2.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
+                const replaced_input3 = input3.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
+                var k = 0;
+
+                if(mode == 1) {
+                    for(var i = 0; i <= input.length; i++) {
+                        k++;
+                        if(input.charAt(i) == '＃') j = i;
+                        else if(input.charAt(i-1) == '`' && i % 100 != 0) continue
+                        else if(input.charAt(i) == '＆') {close_brace_required = 1; k--; while(input.charAt(i) != '＊') i++}
+                        else if(close_brace_required == 1) result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + "＠" + replaced_input2 + "\"]\n";
+                        else result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + replaced_input2 + "\"]\n";
+                        if(close_brace_required == 1 && input.charAt(i) == '＠') close_brace_required = 0;
+
+                        if(i > 20000) break
+                    } // 이거 tellraw \n\n\n\\nn\\n\n\을 맨위로 빼는게 좋긴한데 그냥이렇게하는게 내정신건강에더좋다
+                    result = "scoreboard players add " + name + " " + objective + " 1" + "\n" + "execute if score " + name + " " + objective + " matches " + (k+1) + " run setblock " + setblock_ + " air\n" + result
+
+                }
+                else {
+
+                    for(var i = 0; i <= input.length; i++) {
+                        k++;
+                        if(input.charAt(i) == '＃') j = i;
+                        else if(input.charAt(i-1) == '`' && i % 30 != 0) continue
+                        else if(input.charAt(i) == '＆') {close_brace_required = 1; k--; while(input.charAt(i) != '＊') i++;}
+                        else if(close_brace_required == 1) result += "execute if score " + name + " " + objective + " matches " + k + " run title @a actionbar [\"\",\"" + replaced_input3 + replaced_input.substring(j, i) + "＠" + replaced_input2 + "\"]\n";
+                        else result += "execute if score " + name + " " + objective + " matches " + k + " run title @a actionbar [\"\",\"" + replaced_input3 + replaced_input.substring(j, i) + replaced_input2 + "\"]\n";
+                        if(close_brace_required == 1 && input.charAt(i) == '＠') close_brace_required = 0;
+                    
+                    }
+                    result = "scoreboard players add " + name + " " + objective + " 1" + "\n" + "execute if score " + name + " " + objective + " matches " + (k+1) + " run setblock " + setblock_ + " air\n" + result
+
+                } 
+
+                
+                
+
+            }
+            result = result.replace(/쪯/g, "\\n").replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"")
+            if(mode == 2) result = result.replace(/\\n/g, " ")
+            output.value = result
+
+            
+        }
+    }
+
+
+</script>
+
