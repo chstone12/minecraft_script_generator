@@ -18,7 +18,7 @@
 
 <span style="color:rgb(206, 74, 166);"><b>대사가 다 나온 뒤에 실행될 커맨드 :</b> </span><span style="color:rgb(133, 12, 96)">/setblock <input style="width: 80px" id="setblock" placeholder="~ ~1 ~"> air </span>
 <br>
-<span style="color: gray; font-size:small">숫자 1 옆에 있는 ` ← 이 기호 하나 당 뒤의 대사가 1틱 늦어집니다. (투명 텍스트를 추가한다고 생각하세요.) (개 많이 써도 됩니다 어차피 이거 100개 써도 그 중에 1개만 커맨드로 나와요 (actionbar라면 30개 당 1개))<br>ctrl + z를 누르면 undo, ctrl + shift + z를 누르면 redo가 됩니다. 줄바꿈은 shift + enter, ㅁ한자엔터 누르면 나오는 ＃ 이거 쓰면 다음 페이지<br>역슬래쉬, 큰따옴표 그냥 써도 됨<br>ㅁ한자2 ㅁ한자3 누르면 나오는 ＆＊＠ 이걸로 ＆yellow＊텍스트＠ 이렇게 쓰면 글자 색 바뀜 당연히 RGB도 가능이고 저기 텍스트 부분에 ㄴ한자1 ㄴ한자2 누르면 나오는 ＂ 또는 （ 쓰면 닉네임 출력 가능 (각각 selector @p, @a)</span>
+<span style="color: gray; font-size:small">숫자 1 옆에 있는 ` ← 이 기호 하나 당 뒤의 대사가 1틱 늦어집니다. (투명 텍스트를 추가한다고 생각하세요.) (개 많이 써도 됩니다 어차피 이거 100개 써도 그 중에 1개만 커맨드로 나와요 (actionbar라면 30개 당 1개))<br>ctrl + z를 누르면 undo, ctrl + shift + z를 누르면 redo가 됩니다. 줄바꿈은 shift + enter, ㅁ한자엔터 누르면 나오는 ＃ 이거 쓰면 다음 페이지<br>역슬래쉬, 큰따옴표 그냥 써도 됨<br>ㅁ한자2 ㅁ한자3 누르면 나오는 ＆＊＠ 이걸로 ＆yellow＊텍스트＠ 이렇게 쓰면 글자 색 바뀜 당연히 RGB도 가능이고 저기 텍스트 부분에 ㄴ한자1 ㄴ한자2 누르면 나오는 ＂ 또는 （ 쓰면 닉네임 출력 가능 (각각 selector @p, @a)<br>ㄴ한자3 누르면 나오는 ） 이거 쓰면 ＃처럼 다음 페이지로 넘길 수 있는데, 이건 플레이어가 클릭해야 다음 페이지로 넘어감, ㄴ한자4 ［ 이거는 다음 대사를 보려면 클릭해야 되지만, 다음 페이지로 넘어가지는 않음</span>
 <br>
 
 <br><br>
@@ -83,6 +83,7 @@
 
             let result = "";
             let setblock_ = document.getElementById("setblock").value
+            let unless1 = "execute"; let unless2 = "run";
 
             if(objective == "" || name == "" || input == "") result = "objective랑 name이랑 대사 쓰셈 안그러면 안만들어줄꺼임ㅡㅡ"
             else if(input.includes('DROP TABLE')) result = "[object Object]"
@@ -111,10 +112,12 @@
                         else if(close_brace_required == 1) result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + "＠" + replaced_input2 + "\"]\n";
                         else result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + replaced_input2 + "\"]\n";
                         if(close_brace_required == 1 && input.charAt(i) == '＠') close_brace_required = 0;
+                        if(input.charAt(i) == '）') {result = result + "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a {\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/scoreboard players add " + name + " " + objective + " 1\"},\"text\":\"[ >> ]\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"다음 대사로\"}}\n"; j = i; unless1 += " unless score " + name + " " + objective + " matches " + k}
+                        else if(input.charAt(i) == '［') {result = result + "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a {\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/scoreboard players add " + name + " " + objective + " 1\"},\"text\":\"[ >> ]\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"다음 대사로\"}}\n"; unless1 += " unless score " + name + " " + objective + " matches " + k}
 
                         if(i > 20000) break
                     } // 이거 tellraw \n\n\n\\nn\\n\n\을 맨위로 빼는게 좋긴한데 그냥이렇게하는게 내정신건강에더좋다
-                    result = "scoreboard players add " + name + " " + objective + " 1" + "\n" + "execute if score " + name + " " + objective + " matches " + (k+1) + " run setblock " + setblock_ + " air\n" + result
+                    result = unless1 + " " + unless2 + " scoreboard players add " + name + " " + objective + " 1" + "\n" + "execute if score " + name + " " + objective + " matches " + (k+1) + " run setblock " + setblock_ + " air\n" + result
 
                 }
                 else {
@@ -137,7 +140,7 @@
                 
 
             }
-            result = result.replace(/쪯/g, "\\n").replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"").replace(/\"text\":\"＂\"/g, "\"selector\":\"@p\"").replace(/\"text\":\"（\"/g, "\"selector\":\"@p\"")
+            result = result.replace(/쪯/g, "\\n").replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"").replace(/\"text\":\"＂\"/g, "\"selector\":\"@p\"").replace(/\"text\":\"（\"/g, "\"selector\":\"@p\"").replace(/）/g, "").replace(/［/g, "")
             if(mode == 2) result = result.replace(/\\n/g, " ")
             output.value = result
 
