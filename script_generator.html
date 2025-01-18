@@ -98,12 +98,15 @@
             const input = document.getElementById('input').value
             const lastinput = document.getElementById('lastinput').value
             const input3 = document.getElementById('input3').value
+            const playsound = document.getElementById('playsound').value
+            const replaced_lastinput = lastinput.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
 
             localStorage.setItem('objective', objective);
             localStorage.setItem('name', name);
             localStorage.setItem('input', input);
             localStorage.setItem('lastinput', lastinput);
             localStorage.setItem('input3', input3);
+            localStorage.setItem('playsound', playsound);
 
             let result = "";
             let setblock_ = document.getElementById("setblock").value
@@ -125,7 +128,6 @@
 
 
             const replaced_input = input.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
-            const replaced_lastinput = lastinput.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
             const replaced_input3 = input3.replace(/\n/g, "쪯").replace(/\"/g, "쪮").replace(/\\/g, "∖")
             var k = 0;
 
@@ -134,14 +136,16 @@
                     k++;
                     if(input.charAt(i-1) == '`' && i % 100 == 0) {result = result + "먨"; console.log(1)}
 
+                    if(input.charAt(i) == '）' || input.charAt(i) == '［') result = result + "먨"
+
                     if(input.charAt(i) == '＃') j = i;
                     else if(input.charAt(i-1) == '`' && i % 100 != 0) continue
                     else if(input.charAt(i) == '＆') {close_brace_required = 1; k--; while(input.charAt(i) != '＊') i++}
-                    else if(close_brace_required == 1) result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + "＠" + replaced_lastinput + "\"]\n";
-                    else result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + replaced_lastinput + "\"]\n";
+                    else if(close_brace_required == 1) result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + "＠" + '뙢' + "\"]\n";
+                    else result += "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a [\"\",\"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n" + replaced_input3 + replaced_input.substring(j, i) + '뙢' + "\"]\n";
                     if(close_brace_required == 1 && input.charAt(i) == '＠') close_brace_required = 0;
-                    if(input.charAt(i) == '）') {result = result + "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a {\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/scoreboard players add " + name + " " + objective + " 1\"},\"text\":\"[ >> ]\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"다음 대사로\"}}\n"; j = i; unless1 += " unless score " + name + " " + objective + " matches " + k}
-                    else if(input.charAt(i) == '［') {result = result + "execute if score " + name + " " + objective + " matches " + k + " run tellraw @a {\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/scoreboard players add " + name + " " + objective + " 1\"},\"text\":\"[ >> ]\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"다음 대사로\"}}\n"; unless1 += " unless score " + name + " " + objective + " matches " + k}
+                    if(input.charAt(i) == '）') {result = result + "먨execute if score " + name + " " + objective + " matches " + k + " run tellraw @a {\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/scoreboard players add " + name + " " + objective + " 1\"},\"text\":\"[ >> ]\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"다음 대사로\"}}\n"; j = i; unless1 += " unless score " + name + " " + objective + " matches " + k}
+                    else if(input.charAt(i) == '［') {result = result + "먨execute if score " + name + " " + objective + " matches " + k + " run tellraw @a {\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/scoreboard players add " + name + " " + objective + " 1\"},\"text\":\"[ >> ]\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"다음 대사로\"}}\n"; unless1 += " unless score " + name + " " + objective + " matches " + k}
 
 
                     
@@ -174,7 +178,7 @@
         if(sound == '') {
             result = result.replace(/쪯/g, "\\n").replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"").replace(/\"text\":\"＂\"/g, "\"selector\":\"@p\"").replace(/\"text\":\"（\"/g, "\"selector\":\"@p\"").replace(/）/g, "").replace(/［/g, "")
             if(mode == 2) result = result.replace(/\\n/g, " ")
-            output.value = result.replace(/먨/g, '')
+            output.value = result.replace(/뙢/g, replaced_lastinput).replace(/먨/g, '')
         }
 
         else {
@@ -187,22 +191,26 @@
             push = false;
 
             for(let l = 2; l < array.length - 1; l++) if(array[l].charAt(0) != '먨') scores.push(array[l].split(' ')[6])
-            for(let ll = 2; ll < array.length - 1; ll++) if(array[ll].charAt(0) != '먨') last_letters.push(replaceLastOccurrence(array[ll], the_last_input, "").substring(array[ll].length - 4, array[ll].length - 2))
+            for(let ll = 2; ll < array.length - 1; ll++) if(array[ll].charAt(0) != '먨') last_letters.push(replaceLastOccurrence(array[ll], the_last_input, "").substring(array[ll].length - 5, array[ll].length - 2))
             
 
 
             for(let lll = 1; lll < scores.length; lll++) {
                 push = true
 
-                if(include_enter_for_playsound == false && last_letters[lll].substring(1, 2) == '쪯') push = false
-                if(include_space_for_playsound == false && last_letters[lll].substring(1, 2) == ' ') push = false
-
+                if(last_letters[lll].charAt(1) == '＠') {
+                    if(include_enter_for_playsound == false && last_letters[lll].charAt(0) == '쪯') push = false
+                    if(include_space_for_playsound == false && last_letters[lll].charAt(0) == ' ') push = false
+                } else {
+                    if(include_enter_for_playsound == false && last_letters[lll].charAt(1) == '쪯') push = false
+                    if(include_space_for_playsound == false && last_letters[lll].charAt(1) == ' ') push = false
+                }
                 if(push == true) result2 = result2 + "execute if score " + name + " " + objective + " matches " + scores[lll] + " at @a run playsound " + sound + "\n"
             }
 
             result = result.replace(/`/g, "").replace(/쪮/g, "\\\"").replace(/＃/g, "").replace(/＆/g, "\",{\"color\":\"").replace(/＊/g, "\",\"text\":\"").replace(/＠/g, "\"},\"").replace(/\"text\":\"＂\"/g, "\"selector\":\"@p\"").replace(/\"text\":\"（\"/g, "\"selector\":\"@p\"").replace(/）/g, "").replace(/［/g, "")
                 if(mode == 2) result = result.replace(/\\n/g, " ")
-            output.value = result.replace(/쪯/g, '\\n').replace(/먨/g, '') + result2
+            output.value = result.replace(/뙢/g, replaced_lastinput).replace(/쪯/g, '\\n').replace(/먨/g, '') + result2
 
 
 
